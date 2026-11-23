@@ -1,0 +1,387 @@
+/* All styling for the Animator app. The .gleam files only attach class names. */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+
+/* ── Layout: two columns ─────────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: #1a1a2e;
+  color: #d4c5a0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+}
+
+/* Left column: the code editor. */
+.code-col {
+  width: 42%;
+  min-width: 320px;
+  max-width: 720px;
+  flex-shrink: 0;
+  display: flex;
+  border-right: 1px solid #3a3a5e;
+  background: #0f0f1e;
+}
+
+/* The code column stays in the DOM when collapsed, so CodeMirror keeps its
+   state; hiding it gives the right column the full width. */
+.app.code-hidden .code-col { display: none; }
+
+/* A small emoji button (the code pane's collapse toggle, and the playback
+   controls once they exist). */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #2a2a4a;
+  color: #d4c5a0;
+  border: 1px solid #4a4a8a;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 5px 8px;
+}
+.icon-btn:hover { background: #3a3a5e; }
+
+/* ── Code panel (left column) ───────────────────────────────────────────── */
+
+.code-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #1a1a3e;
+  border-bottom: 1px solid #3a3a5e;
+}
+.code-title {
+  color: #e8d8b0;
+  font-family: 'Georgia', serif;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+/* Wrapper holding the editor. */
+.code-editor-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+/* CodeMirror mount node: grows to fill the panel. */
+.code-editor {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  background: #0d0d1a;
+}
+.code-editor .cm-editor { width: 100%; height: 100%; }
+
+/* Collapsible reference of the built-ins available to draw functions. */
+.reference {
+  margin: 8px 14px 0;
+  border: 1px solid #3a3a5e;
+  border-radius: 4px;
+  background: #0d0d1a;
+  overflow: hidden;
+}
+.reference-summary {
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #b8a888;
+  font-family: monospace;
+  font-size: 12px;
+  user-select: none;
+}
+.reference-summary:hover { color: #e8d8b0; }
+.reference-body {
+  padding: 4px 12px 10px;
+  border-top: 1px solid #3a3a5e;
+}
+.reference-group { margin-top: 8px; }
+.reference-group-title {
+  color: #8a8aca;
+  font-family: monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.reference-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 1px 0;
+}
+.reference-sig {
+  color: #89ddff;
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre;
+}
+.reference-desc { color: #6a7a8a; font-size: 11px; }
+
+/* ── Animation area (right column) ──────────────────────────────────────── */
+
+.canvas-area {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a14;
+  container-type: size;
+}
+
+/* The interpreter's List(Path) (or its error), shown as text before the
+   animation pane is built. */
+.output {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  max-width: calc(100% - 32px);
+  max-height: 40%;
+  align-self: stretch;
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cfe3ff;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+/* Leave room for the reveal button, which only overlays this pane while the
+   code column is hidden. */
+.app.code-hidden .output { padding-top: 48px; }
+
+/* Button that reveals the code column again when it is hidden. */
+.reveal-code {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+}
+
+.animation-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 10;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #3a3a5e;
+  border-radius: 6px;
+  background: rgba(15, 15, 30, 0.92);
+}
+
+.drawing-library {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+}
+
+.drawing-library select {
+  min-width: 150px;
+  max-width: 220px;
+  padding: 6px 8px;
+  border: 1px solid #4a4a8a;
+  border-radius: 4px;
+  background: #2a2a4a;
+  color: #d4c5a0;
+  font-size: 13px;
+}
+
+.game-panel {
+  position: absolute;
+  top: 58px;
+  left: 12px;
+  z-index: 10;
+  width: 220px;
+  padding: 12px;
+  border: 1px solid #4a4a8a;
+  border-radius: 8px;
+  background: rgba(15, 15, 30, 0.94);
+  color: #d4c5a0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+}
+
+.game-title {
+  color: #e8d8b0;
+  font-family: Georgia, serif;
+  font-size: 17px;
+}
+
+.game-description {
+  margin: 5px 0 10px;
+  color: #9da8bd;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.character-select {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #4a4a8a;
+  border-radius: 4px;
+  background: #2a2a4a;
+  color: #d4c5a0;
+}
+
+.character-card {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+.character-emoji {
+  font-size: 28px;
+}
+
+.food-hint {
+  color: #9da8bd;
+  font-size: 11px;
+}
+
+.game-stage {
+  position: relative;
+  height: 58px;
+  overflow: hidden;
+  border: 1px solid #3a6a4a;
+  border-radius: 5px;
+  background: linear-gradient(#1b2940, #24412e);
+}
+
+.game-character,
+.game-food {
+  position: absolute;
+  bottom: 8px;
+  z-index: 1;
+  font-size: 27px;
+  line-height: 1;
+  user-select: none;
+}
+
+.game-character {
+  left: 0;
+  transform-origin: center;
+}
+
+.game-food {
+  left: 180px;
+  z-index: 0;
+}
+
+.game-instruction {
+  margin-top: 6px;
+  color: #9da8bd;
+  font-size: 11px;
+}
+
+.game-toggle {
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px;
+  border: 1px solid #6a6aaa;
+  border-radius: 4px;
+  background: #3a3a5e;
+  color: #f0e5c4;
+  cursor: pointer;
+}
+
+.game-toggle:hover {
+  background: #4a4a7a;
+}
+
+.score {
+  margin-top: 9px;
+  color: #89ddff;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.leaderboard {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #3a3a5e;
+}
+
+.leaderboard-title {
+  margin-bottom: 4px;
+  color: #e8d8b0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.leaderboard-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  color: #9da8bd;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.game-reset {
+  width: 100%;
+  margin-top: 8px;
+  padding: 5px;
+  border: 1px solid #4a4a8a;
+  border-radius: 4px;
+  background: #2a2a4a;
+  color: #d4c5a0;
+  cursor: pointer;
+}
+
+.game-reset:hover {
+  background: #3a3a5e;
+}
+
+.slider-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #d4c5a0;
+  font-size: 12px;
+}
+
+.slider-control input {
+  width: 120px;
+  accent-color: #8a8aca;
+}
+
+.slider-label {
+  min-width: 38px;
+  text-align: right;
+}
+
+
+/* A centred square that fits the (possibly non-square) animation area. Give your
+   <canvas> this class, so that drawings aren't stretched. */
+.canvas {
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+}
+
